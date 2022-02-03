@@ -6,6 +6,11 @@ const server = express();
 server.use(cors());
 server.use(express.json());
 
+const staticServerPath = "./public-react";
+server.use(express.static(staticServerPath));
+const staticServerPathImg = "./public-movies-images";
+server.use(express.static(staticServerPathImg));
+
 // init express aplication
 const serverPort = 4030;
 server.listen(serverPort, () => {
