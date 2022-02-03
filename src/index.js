@@ -1,6 +1,7 @@
-const express = require('express');
-const cors = require('cors');
-const movieData = require('./data/movies.json')
+const express = require("express");
+const cors = require("cors");
+const movieData = require("./data/movies.json");
+const users = require("./data/users.json");
 // create and config server
 const server = express();
 server.use(cors());
@@ -12,19 +13,51 @@ const staticServerPathImg = "./public-movies-images";
 server.use(express.static(staticServerPathImg));
 
 // init express aplication
-const serverPort = 4030;
+const serverPort = 4000;
 server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
-server.get('/movies', (req, res) => {
-     const response = {
-    success: true,
-    movies: movieData
-  }
-  ;
-const filterMovies = response.movies
-.filter((movie) => 
-req.query.filter === "" ? true : movie.gender === req.query.filter); 
+server.get("/movies", (req, res) => {
+  const genderFilterParam = req.query.gender;
+  const sortParam = req.query.sort;
 
-res.json(filterMovies);
+  const filterMovies = movieData
+    .filter((movie) =>
+      genderFilterParam === "" ? true : movie.gender === genderFilterParam
+    )
+    .sort((a, b) => {
+      if (
+        (sortParam === "asc" && a.title > b.title) ||
+        (sortParam === "desc" && a.title < b.title)
+      ) {
+        return 1;
+      } else {
+        return -1;
+      }
+    });
+
+  res.json({
+    success: true,
+    movies: filterMovies,
+  });
+});
+server.post("/login", (req, res) => {
+  const emailParam = req.body.email;
+  const passwordParam = req.body.password; 
+  console.log(req.body);
+  const findResult = users.find((user) =>
+  user.email === emailParam && user.password === passwordParam);
+  if (findResult !== undefined) {
+    res.json({
+      success: true,
+      userId: "id_de_la_usuaria_encontrada",
+    });
+  } else {
+    res.json({
+      "success": false,
+       "errorMessage": "Usuaria/o no encontrada/o",
+    });
+  }
+
+  res.json();
 });
