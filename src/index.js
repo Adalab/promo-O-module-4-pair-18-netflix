@@ -6,6 +6,9 @@ const server = express();
 server.use(cors());
 server.use(express.json());
 
+const staticServerPath = "./public-react";
+server.use(express.static(staticServerPath));
+
 // init express aplication
 const serverPort = 4000;
 server.listen(serverPort, () => {
@@ -14,7 +17,7 @@ server.listen(serverPort, () => {
 server.get('/movies', (req, res) => {
    const response = {
     success: true,
-    movies: {movieData}
+    movies: movieData
   }
-  res.json({success:true, movies:[{movieData}]});
+  res.json(response);
 })
