@@ -3,20 +3,21 @@ const cors = require('cors');
 //Importamos los datos de las peliculas
 //La constante movies es un array con la info de las peliculas
 const movies = require('./data/movies.json');
+//La constante users es un array con la info de los usuarios
+const users = require('./data/users.json');
 // create and config server
-const server = express();
-server.use(cors());
-server.use(express.json());
+const app = express();
+app.use(cors());
+app.use(express.json());
 
 // init express aplication
 const serverPort = 4000;
-server.listen(serverPort, () => {
+app.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
 
-server.get('/movies', (req, res) => {
+app.get('/movies', (req, res) => {
   //Consoleamos los query params que recibimos del fetch
-  console.log(req.query);
   //Guardamos el valor del parametro gender en una constante
   const genderFilterParam = req.query.gender;
   const sortParam = req.query.sort;
@@ -42,3 +43,32 @@ server.get('/movies', (req, res) => {
     movies: filteredMovies
   });
 });
+
+//Definimos el endpoint del fetch de login
+app.post('/login', (req, res) => {
+  console.log(req.body);
+  const emailParam = req.body.email;
+  const passwordParam = req.body.password;
+
+  const findResult = users.find((user) => user.email === emailParam && user.password === passwordParam);
+
+  if (findResult != undefined) {
+    res.json({
+      "success": true,
+      "userId": "id_de_la_usuaria_encontrada"
+    });
+  } else {
+    res.json({
+      "success": false,
+      "errorMessage": "Usuaria/o no encontrada/o"
+    });
+  }
+});
+
+//Añadimos el servidor de estaticos de react
+const staticServerPathWeb = "./src/public-react";
+app.use(express.static(staticServerPathWeb));
+
+//Añadimos el servidor de estaticos de imagenes
+const staticServerPathImages = "./src/public-movies-images";
+app.use(express.static(staticServerPathImages));
