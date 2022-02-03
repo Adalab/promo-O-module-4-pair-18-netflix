@@ -24,7 +24,7 @@ server.get('/movies', (req, res) => {
   ;
 const filterMovies = response.movies
 .filter((movie) => 
-movie.gender === req.query.filter); 
+req.query.filter === "" ? true : movie.gender === req.query.filter); 
 
 res.json(filterMovies);
 });
