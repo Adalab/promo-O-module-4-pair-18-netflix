@@ -8,6 +8,8 @@ server.use(express.json());
 
 const staticServerPath = "./public-react";
 server.use(express.static(staticServerPath));
+const staticServerPath = "./public-movies-images";
+server.use(express.static(staticServerPath));
 
 // init express aplication
 const serverPort = 4000;
