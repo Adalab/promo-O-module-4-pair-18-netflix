@@ -6,11 +6,14 @@ const users = require("./data/users.json");
 const server = express();
 server.use(cors());
 server.use(express.json());
+server.set('view engine', 'ejs');
 
 const staticServerPath = "./public-react";
 server.use(express.static(staticServerPath));
 const staticServerPathImg = "./public-movies-images";
 server.use(express.static(staticServerPathImg));
+const staticServerPathStyles = "./public-styles";
+server.use(express.static(staticServerPathStyles));
 
 // init express aplication
 const serverPort = 4000;
@@ -61,3 +64,13 @@ server.post("/login", (req, res) => {
 
   res.json();
 });
+
+server.get('/movie/:movieId', (req, res) => {
+  const requestParamsId = req.params.movieId;
+  
+
+  const foundMovie = movieData.find((movie) => parseInt(movie.id) === parseInt(requestParamsId));
+  res.render("movie", foundMovie);
+});
+
+
