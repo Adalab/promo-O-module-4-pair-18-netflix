@@ -7,7 +7,7 @@ const DataBase = require("better-sqlite3");
 const server = express();
 server.use(cors());
 server.use(express.json());
-server.set('view engine', 'ejs');
+server.set("view engine", "ejs");
 
 const staticServerPathStyles = "./public-styles";
 server.use(express.static(staticServerPathStyles));
@@ -17,7 +17,7 @@ server.use(express.static(staticServerPathImg));
 
 // Base de datos:
 
-const db = new DataBase('./src/db/database.db', {verbose: console.log});
+const db = new DataBase("./src/db/database.db", { verbose: console.log });
 // init express aplication
 const serverPort = 4000;
 server.listen(serverPort, () => {
@@ -25,24 +25,35 @@ server.listen(serverPort, () => {
 });
 server.get("/movies", (req, res) => {
   const genderFilterParam = req.query.gender;
-  const sortParam = req.query.sort;
+  console.log(genderFilterParam);
+  const sortParam = req.query.sort.toLocaleUpperCase();
+  console.log(sortParam);
 
-  const  query = db.prepare("SELECT * FROM movies WHERE gender = ? ");
+  const query = db.prepare("SELECT * FROM movies WHERE gender = ?");
+  const allquery = db.prepare("SELECT * FROM movies");
 
-  const allMovies = query.all();
-  const filterMovies = query.get(gender);
-  if (genderFilterParam === ""){
-    res.json({
+  // const allMovies = query.all();
+  const moviesByGender = query.all(genderFilterParam);
+  const allMovies = allquery.all();
+  
+  if (genderFilterParam !== "") {res.json({
       success: true,
-      movies: allMovies,
-    });
+      movies: moviesByGender,
+    });} else {
+      res.json({
+        success: true,
+        movies: allMovies,
+      });
+    }
+ 
+  
+  
+    
+  
+   
 
-  } else if (filterMovies === genderFilterParam){
-    res.json({
-      success: true,
-      movies: filterMovies,
-    });
-  }
+    
+  
 
   // const filterMovies = movieData
   //   .filter((movie) =>
@@ -58,15 +69,14 @@ server.get("/movies", (req, res) => {
   //       return -1;
   //     }
   //   });
-
- 
 });
 server.post("/login", (req, res) => {
   const emailParam = req.body.email;
-  const passwordParam = req.body.password; 
+  const passwordParam = req.body.password;
   console.log(req.body);
-  const findResult = users.find((user) =>
-  user.email === emailParam && user.password === passwordParam);
+  const findResult = users.find(
+    (user) => user.email === emailParam && user.password === passwordParam
+  );
   if (findResult !== undefined) {
     res.json({
       success: true,
@@ -74,22 +84,22 @@ server.post("/login", (req, res) => {
     });
   } else {
     res.json({
-      "success": false,
-       "errorMessage": "Usuaria/o no encontrada/o",
+      success: false,
+      errorMessage: "Usuaria/o no encontrada/o",
     });
   }
 
   res.json();
 });
 
-server.get('/movie/:movieId', (req, res) => {
+server.get("/movie/:movieId", (req, res) => {
   const requestParamsId = req.params.movieId;
-  
 
-  const foundMovie = movieData.find((movie) => parseInt(movie.id) === parseInt(requestParamsId));
+  const foundMovie = movieData.find(
+    (movie) => parseInt(movie.id) === parseInt(requestParamsId)
+  );
   res.render("movie", foundMovie);
 });
-
 
 const staticServerPath = "./public-react";
 server.use(express.static(staticServerPath));
