@@ -13,8 +13,8 @@
     },
     {
         "id": "3",
-        "title": "Agente 007",
-        "gender": "Acción",
-        "image": "https://via.placeholder.com/150"
+        "title": "Me siento como un muñeco",
+        "gender": "Drama",
+        "image": "//localhost:4000/muneco.jpg"
     }
 ]
