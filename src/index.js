@@ -24,15 +24,15 @@ server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
 server.get("/movies", (req, res) => {
-  const genderFilterParam = req.query.gender;
-  console.log(genderFilterParam);
-  const sortParam = req.query.sort.toLocaleUpperCase();
-  console.log(sortParam);
+  // Recogemos datos. 
+  const genderFilterParam = req.query.gender; // "", Drama, Comedia. 
+  const sortParam = req.query.sort;  // ASC o DESC
 
-  const query = db.prepare("SELECT * FROM movies WHERE gender = ?");
-  const allquery = db.prepare("SELECT * FROM movies");
+  // Relación con base de datos. 
+  const query = db.prepare(`SELECT * FROM movies WHERE gender = ? ORDER BY name ${sortParam}`);
+  const allquery = db.prepare(`SELECT * FROM movies ORDER BY name ${sortParam}`);
 
-  // const allMovies = query.all();
+  // Como nos devuelve datos la BD. 
   const moviesByGender = query.all(genderFilterParam);
   const allMovies = allquery.all();
   
@@ -44,36 +44,13 @@ server.get("/movies", (req, res) => {
         success: true,
         movies: allMovies,
       });
-    }
- 
-  
-  
-    
-  
-   
+    } 
 
-    
-  
-
-  // const filterMovies = movieData
-  //   .filter((movie) =>
-  //     genderFilterParam === "" ? true : movie.gender === genderFilterParam
-  //   )
-  //   .sort((a, b) => {
-  //     if (
-  //       (sortParam === "asc" && a.title > b.title) ||
-  //       (sortParam === "desc" && a.title < b.title)
-  //     ) {
-  //       return 1;
-  //     } else {
-  //       return -1;
-  //     }
-  //   });
 });
 server.post("/login", (req, res) => {
   const emailParam = req.body.email;
   const passwordParam = req.body.password;
-  console.log(req.body);
+
   const findResult = users.find(
     (user) => user.email === emailParam && user.password === passwordParam
   );
@@ -93,11 +70,15 @@ server.post("/login", (req, res) => {
 });
 
 server.get("/movie/:movieId", (req, res) => {
+
   const requestParamsId = req.params.movieId;
 
-  const foundMovie = movieData.find(
-    (movie) => parseInt(movie.id) === parseInt(requestParamsId)
-  );
+  const query = db.prepare("SELECT * FROM movies WHERE id = ?");
+  const foundMovie = query.get(requestParamsId);
+
+  // const foundMovie = movieData.find(
+  //   (movie) => parseInt(movie.id) === parseInt(requestParamsId)
+  // );
   res.render("movie", foundMovie);
 });
 
