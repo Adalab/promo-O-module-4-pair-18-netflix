@@ -3,6 +3,7 @@ const cors = require("cors");
 const movieData = require("./data/movies.json");
 const users = require("./data/users.json");
 const DataBase = require("better-sqlite3");
+const { response } = require("express");
 // create and config server
 const server = express();
 server.use(cors());
@@ -24,34 +25,32 @@ server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
 server.get("/movies", (req, res) => {
-  // Recogemos datos. 
-  const genderFilterParam = req.query.gender; // "", Drama, Comedia. 
-  const sortParam = req.query.sort;  // ASC o DESC
+  // Recogemos datos.
+  const genderFilterParam = req.query.gender; // "", Drama, Comedia.
+  const sortParam = req.query.sort; // ASC o DESC
   console.log(sortParam);
   console.log(genderFilterParam);
-  // Relación con base de datos. 
-  
-  
-  // Como nos devuelve datos la BD.  
- 
-  
-  if (genderFilterParam !== undefined) {
-    
-    const queryMoviesFilterByGender = db.prepare(`SELECT * FROM movies WHERE gender = ? ORDER BY name ${sortParam}`);
+  // Relación con base de datos.
+
+  // Como nos devuelve datos la BD.
+
+  if (genderFilterParam === undefined) {
+    const allquery = db.prepare(`SELECT * FROM movies ORDER BY name ASC`);
+    const allMovies = allquery.all();
+    res.json({
+      success: true,
+      movies: allMovies,
+    });
+  } else {
+    const queryMoviesFilterByGender = db.prepare(
+      `SELECT * FROM movies WHERE gender = ? ORDER BY name ${sortParam}`
+    );
     const moviesByGender = queryMoviesFilterByGender.all(genderFilterParam);
     res.json({
       success: true,
       movies: moviesByGender,
     });
-  } else {
-      const allquery = db.prepare(`SELECT * FROM movies ORDER BY name ASC`);
-      const allMovies = allquery.all();
-      res.json({
-        success: true,
-        movies: allMovies,
-      });
-    } 
-
+  }
 });
 server.post("/login", (req, res) => {
   const emailParam = req.body.email;
@@ -75,8 +74,32 @@ server.post("/login", (req, res) => {
   res.json();
 });
 
-server.get("/movie/:movieId", (req, res) => {
+server.post("/sing-up", (req, res) => {
+  const emailParam = req.body.email;
+  const passwordParam = req.body.password;
+  const queryUser = db.prepare(
+    `SELECT * FROM users WHERE email = ?`
+  );
+  const foundUsers = queryUser.get(emailParam);
 
+  if ( foundUsers  === undefined){
+    const query = db.prepare("INSERT INTO users (email, password) VALUES (?, ?)");
+  const userInsert = query.run(emailParam, passwordParam); 
+  res.json({
+    error: false, 
+    userId: userInsert.lastInsertRowid
+  })
+  }  else {
+  res.json({
+    error: true,
+    message: "La usuaria ya existe"
+  });
+}
+
+
+});
+
+server.get("/movie/:movieId", (req, res) => {
   const requestParamsId = req.params.movieId;
 
   const query = db.prepare("SELECT * FROM movies WHERE id = ?");
