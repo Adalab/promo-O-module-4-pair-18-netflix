@@ -29,13 +29,14 @@ server.get("/movies", (req, res) => {
   const genderFilterParam = req.query.gender; // "", Drama, Comedia.
   const sortParam = req.query.sort; // ASC o DESC
   console.log(sortParam);
-  console.log(genderFilterParam);
+  console.log(typeof genderFilterParam === "string");
+  
   // Relación con base de datos.
 
   // Como nos devuelve datos la BD.
 
-  if (genderFilterParam === undefined) {
-    const allquery = db.prepare(`SELECT * FROM movies ORDER BY name ASC`);
+  if (genderFilterParam === "all") {
+    const allquery = db.prepare(`SELECT * FROM movies ORDER BY name ${sortParam}`);
     const allMovies = allquery.all();
     res.json({
       success: true,
@@ -55,14 +56,18 @@ server.get("/movies", (req, res) => {
 server.post("/login", (req, res) => {
   const emailParam = req.body.email;
   const passwordParam = req.body.password;
+  const query = db.prepare(`SELECT * FROM users WHERE email = ? `);
+  const userFound = query.get(emailParam);
 
-  const findResult = users.find(
-    (user) => user.email === emailParam && user.password === passwordParam
-  );
-  if (findResult !== undefined) {
-    res.json({
-      success: true,
-      userId: "id_de_la_usuaria_encontrada",
+
+
+  // const findResult = users.find(
+  //   (user) => user.email === emailParam && user.password === passwordParam
+  // );
+  if (userFound === undefined) {
+      res.json({
+      success: false,
+      errorMessage: "Usuaria/o no encontrada/o",
     });
   } else {
     res.json({
