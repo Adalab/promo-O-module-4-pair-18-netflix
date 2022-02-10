@@ -1,3 +1,20 @@
 body {
-    background-color: rgb(179, 88, 88);
+    background-color: rgb(0, 0, 0);
+}
+.header {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+.main {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    
+}
+.title {
+    color: rgb(168, 240, 216);
+}
+.data {
+    color: rgb(168, 240, 216);
 }
