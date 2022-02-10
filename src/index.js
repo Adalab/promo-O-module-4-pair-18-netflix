@@ -56,14 +56,10 @@ server.get("/movies", (req, res) => {
 server.post("/login", (req, res) => {
   const emailParam = req.body.email;
   const passwordParam = req.body.password;
-  const query = db.prepare(`SELECT * FROM users WHERE email = ? `);
-  const userFound = query.get(emailParam);
-
-
-
-  // const findResult = users.find(
-  //   (user) => user.email === emailParam && user.password === passwordParam
-  // );
+  
+  const findResult = users.find(
+    (user) => user.email === emailParam && user.password === passwordParam
+  );
   if (userFound === undefined) {
       res.json({
       success: false,
