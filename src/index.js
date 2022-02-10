@@ -56,14 +56,14 @@ server.get("/movies", (req, res) => {
 server.post("/login", (req, res) => {
   const emailParam = req.body.email;
   const passwordParam = req.body.password;
-  
+
   const findResult = users.find(
     (user) => user.email === emailParam && user.password === passwordParam
   );
-  if (userFound === undefined) {
-      res.json({
-      success: false,
-      errorMessage: "Usuaria/o no encontrada/o",
+  if (findResult !== undefined) {
+    res.json({
+      success: true,
+      userId: "id_de_la_usuaria_encontrada",
     });
   } else {
     res.json({
